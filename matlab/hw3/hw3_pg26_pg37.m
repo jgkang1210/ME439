@@ -1,7 +1,7 @@
 % 20190348 Jungill Kang
 addpath('..\mr')
 
-%% p26
+%% p26, 37
 % L1 : 266, L2 : 215, H1 : 123, H2 : 109, H3 : 105, W1 : 78, W2 : 9, W3 : 69, W4 : 65, W5 : 65
 L1 = 266;
 L2 = 215;
@@ -143,7 +143,9 @@ T_final_s = T1_s * T2_s * T3_s * T4_s * T5_s * T6_s * M;
 T_final_b = M * T1_b * T2_b * T3_b * T4_b * T5_b * T6_b;
 
 disp("-------------------");
-disp("p26");
+disp("p26, 37");
+disp("M");
+disp(M);
 disp("For spatial theta( 1 2 3 4 5 6 )=>( 0 0 0 0 pi/2 0 )");
 disp("T_final in spatial twist");
 disp(T_final_s);
@@ -155,5 +157,7 @@ disp(T_final_b);
 AdjM = Adjoint(M);
 disp("screw_s");
 disp(screw_s);
+disp("screw_b");
+disp(screw_b);
 disp("AdjM(screw_b)");
 disp(AdjM * screw_b);

@@ -1,55 +1,63 @@
 % 20190348 Jungill Kang
 addpath('..\mr')
 
-%% p21
-% L1 : 10, L2 : 10
-L1 = 10;
-L2 = 10;
+%% p36
+% L1 : 449.5, L2 : 265.5, L3 : 228, H1 : 223, H2 : 84.5, W1 : 109.3, W2 : 31.1, W3 : 74.2, W4 : 114.3, W5 : 68.7
+L1 = 449.5;
+L2 = 265.5;
+L3 = 228;
+H1 = 223;
+H2 = 84.5;
+W1 = 109.3;
+W2 = 31.1;
+W3 = 74.2;
+W4 = 114.3;
+W5 = 68.7;
 
 % q
 % spatial frame
 q1_s = [0 0 0]';
-q2_s = [0 0 0]';
-q3_s = [0 0 0]';
-q4_s = [0 0 0]';
-q5_s = [0 L1 0]';
-q6_s = [0 L1+L2 0]';
+q2_s = [-W1 0 H1]';
+q3_s = [-W1+W2 0 H1+L1]';
+q4_s = [-W1+W2+W3 0 H1+L1+L2]';
+q5_s = [-W1+W2+W3-W4 0 H1+L1+L2+H2]';
+q6_s = [-W1+W2+W3-W4-W5 0 H1+L1+L2+H2+L3]';
 % body frame
-q1_b = [0 -L1-L2 0]';
-q2_b = [0 -L1-L2 0]';
-q3_b = [0 0 0]';
-q4_b = [0 0 0]';
-q5_b = [0 -L2 0]';
+q1_b = [W5+W4-W3-W2+W1 0 -L3-H2-L2-L1-H1]';
+q2_b = [W5+W4-W3-W2 0 -L3-H2-L2-L1]';
+q3_b = [W5+W4-W3 0 -L3-H2-L2]';
+q4_b = [W5+W4 0 -L3-H2]';
+q5_b = [W5 0 -L3]';
 q6_b = [0 0 0]';
 
 % w
 % spatial frame
 w1_s = [0 0 1]';
-w2_s = [1 0 0]';
-w3_s = [0 0 0]';
-w4_s = [0 1 0]';
-w5_s = [1 0 0]';
-w6_s = [0 1 0]';
+w2_s = [-1 0 0]';
+w3_s = [-1 0 0]';
+w4_s = [0 0 1]';
+w5_s = [-1 0 0]';
+w6_s = [0 0 1]';
 % body frame
 w1_b = [0 0 1]';
-w2_b = [1 0 0]';
-w3_b = [0 0 0]';
-w4_b = [0 1 0]';
-w5_b = [1 0 0]';
-w6_b = [0 1 0]';
+w2_b = [-1 0 0]';
+w3_b = [-1 0 0]';
+w4_b = [0 0 1]';
+w5_b = [-1 0 0]';
+w6_b = [0 0 1]';
 
 % v
 % spatial frame
 v1_s = VecToso3(q1_s) * w1_s;
 v2_s = VecToso3(q2_s) * w2_s;
-v3_s = [0 1 0]';
+v3_s = VecToso3(q3_s) * w3_s;
 v4_s = VecToso3(q4_s) * w4_s;
 v5_s = VecToso3(q5_s) * w5_s;
 v6_s = VecToso3(q6_s) * w6_s;
 % body frame
 v1_b = VecToso3(q1_b) * w1_b;
 v2_b = VecToso3(q2_b) * w2_b;
-v3_b = [0 1 0]';
+v3_b = VecToso3(q3_b) * w3_b;
 v4_b = VecToso3(q4_b) * w4_b;
 v5_b = VecToso3(q5_b) * w5_b;
 v6_b = VecToso3(q6_b) * w6_b;
@@ -91,9 +99,9 @@ screw_b = [s1_b s2_b s3_b s4_b s5_b s6_b];
 
 % initial matrix
 M = [
-    1 0 0 0;
-    0 1 0 L1+L2;
-    0 0 1 0;
+    1 0 0 -W1+W2+W3-W4-W5;
+    0 1 0 0;
+    0 0 1 H1+L1+L2+H2+L3;
     0 0 0 1];
 
 % random theta
@@ -135,7 +143,9 @@ T_final_s = T1_s * T2_s * T3_s * T4_s * T5_s * T6_s * M;
 T_final_b = M * T1_b * T2_b * T3_b * T4_b * T5_b * T6_b;
 
 disp("-------------------");
-disp("p21");
+disp("p36");
+disp("M");
+disp(M);
 disp("For spatial theta( 1 2 3 4 5 6 )=>( 0 0 0 0 pi/2 0 )");
 disp("T_final in spatial twist");
 disp(T_final_s);
@@ -147,5 +157,7 @@ disp(T_final_b);
 AdjM = Adjoint(M);
 disp("screw_s");
 disp(screw_s);
+disp("screw_b");
+disp(screw_b);
 disp("AdjM(screw_b)");
 disp(AdjM * screw_b);

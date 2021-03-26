@@ -136,6 +136,8 @@ T_final_b = M * T1_b * T2_b * T3_b * T4_b * T5_b * T6_b;
 
 disp("-------------------");
 disp("p21");
+disp("M");
+disp(M);
 disp("For spatial theta( 1 2 3 4 5 6 )=>( 0 0 0 0 pi/2 0 )");
 disp("T_final in spatial twist");
 disp(T_final_s);
@@ -147,5 +149,7 @@ disp(T_final_b);
 AdjM = Adjoint(M);
 disp("screw_s");
 disp(screw_s);
+disp("screw_b");
+disp(screw_b);
 disp("AdjM(screw_b)");
 disp(AdjM * screw_b);
