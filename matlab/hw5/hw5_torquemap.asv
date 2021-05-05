@@ -1,0 +1,73 @@
+% 20190348 Jungill Kang
+addpath('..\mr')
+
+clear;
+
+%% open chain robot
+
+theta1 = pi/4;
+theta2 = pi/4;
+
+s1 = sin(theta1);
+s2 = sin(theta2);
+c1 = cos(theta1);
+c2 = cos(theta2);
+
+M = [
+    8 + 2*s2^2 2*c2;
+    2*c2 6;];
+
+figure(1);
+title('Torque map');
+xlabel('t1');
+ylabel('t2');
+
+grid ON;
+axis square; % square graph
+
+xlim([-2.5, 2.5]); % x range
+ylim([-2.5, 2.5]); % y range
+
+line(x1, y1, 'Color', 'red');
+text(p1(1)/2, p1(2)/2 - 0.1, 'L1');
+hold on;
+line(x2, y2, 'Color', 'blue');
+text((p1(1)+p2(1))/2 + 0.1, (p1(2)+p2(2))/2, 'L2');
+hold on;
+
+
+% make unit circle
+% scale factor for circle
+scale = 0.2;
+for alpha = 0 : 0.01 : 2*pi
+    cosAlpha = scale * cos(alpha);
+    sinAlpha = scale * sin(alpha);
+    thetaDot = [cosAlpha sinAlpha]';
+    
+    % mapping each value
+    xDot = J_analytic * thetaDot;
+    
+    % draw the point on the graph
+    plot(xDot(1), xDot(2), 'go', 'MarkerSize', 1);
+    hold on;
+end
+
+% Now calculate three measure
+
+% decompose the eigenvalue from J_analytic * J_analytic transpose
+Evalue = eig(J_analytic * J_analytic');
+
+minEvalue = min(Evalue);
+maxEvalue = max(Evalue);
+
+firstMeasure = sqrt(maxEvalue / minEvalue);
+firstMeasureText = "first measure : " + firstMeasure;
+text(-0.9, 1.8, firstMeasureText);
+
+secondMeasure = maxEvalue / minEvalue;
+secondMeasureText = "second measure : " + secondMeasure;
+text(-0.9, 1.7, secondMeasureText);
+
+thirdMeasure = sqrt(det(J_analytic * J_analytic'));
+thirdMeasureText = "third measure : " + thirdMeasure;
+text(-0.9, 1.6, thirdMeasureText);
