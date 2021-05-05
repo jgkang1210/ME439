@@ -1,7 +1,7 @@
 % 20190348 Jungill Kang
 addpath('..\mr')
 
-%% p36, indy 7 by Neuromeka
+%% Indy 7 inverse kinematics
 % L1 : 449.5, L2 : 265.5, L3 : 228, H1 : 223, H2 : 84.5, W1 : 109.3, W2 : 31.1, W3 : 74.2, W4 : 114.3, W5 : 68.7
 L1 = 449.5;
 L2 = 265.5;
@@ -94,8 +94,8 @@ s4_se3_b = VecTose3(s4_b);
 s5_se3_b = VecTose3(s5_b);
 s6_se3_b = VecTose3(s6_b);
 
-screw_s = [s1_s s2_s s3_s s4_s s5_s s6_s];
-screw_b = [s1_b s2_b s3_b s4_b s5_b s6_b];
+SList = [s1_s s2_s s3_s s4_s s5_s s6_s];
+BList = [s1_b s2_b s3_b s4_b s5_b s6_b];
 
 % initial matrix
 M = [
@@ -105,59 +105,26 @@ M = [
     0 0 0 1];
 
 % random theta
-% spatial frame
-theta1_s = 0;
-theta2_s = 0;
-theta3_s = 0;
-theta4_s = 0;
-theta5_s = pi/2;
-theta6_s = 0;
 % body frame
-theta1_b = 0;
-theta2_b = 0;
+theta1_b = pi/4;
+theta2_b = pi/3;
 theta3_b = 0;
-theta4_b = 0;
+theta4_b = pi/5;
 theta5_b = pi/2;
-theta6_b = 0;
+theta6_b = pi;
+thetalist = [theta1_b theta2_b theta3_b theta4_b theta5_b theta6_b]';
 
-% transformation matrix for se3 matrix
-% spatial frame
-T1_s = MatrixExp6(s1_se3_s * theta1_s);
-T2_s = MatrixExp6(s2_se3_s * theta2_s);
-T3_s = MatrixExp6(s3_se3_s * theta3_s);
-T4_s = MatrixExp6(s4_se3_s * theta4_s);
-T5_s = MatrixExp6(s5_se3_s * theta5_s);
-T6_s = MatrixExp6(s6_se3_s * theta6_s);
-% body frame
-T1_b = MatrixExp6(s1_se3_b * theta1_b);
-T2_b = MatrixExp6(s2_se3_b * theta2_b);
-T3_b = MatrixExp6(s3_se3_b * theta3_b);
-T4_b = MatrixExp6(s4_se3_b * theta4_b);
-T5_b = MatrixExp6(s5_se3_b * theta5_b);
-T6_b = MatrixExp6(s6_se3_b * theta6_b);
+% use FKinBody()
+Tdesired = FKinBody(M, BList, thetalist);
 
-% transformed Transformation matrix
-% spatial frame
-T_final_s = T1_s * T2_s * T3_s * T4_s * T5_s * T6_s * M;
-% body frame
-T_final_b = M * T1_b * T2_b * T3_b * T4_b * T5_b * T6_b;
+% guess for IK
+thetaini = [0 0 0 0 0 0]';
 
-disp("-------------------");
-disp("p36");
-disp("M");
-disp(M);
-disp("For spatial theta( 1 2 3 4 5 6 )=>( 0 0 0 0 pi/2 0 )");
-disp("T_final in spatial twist");
-disp(T_final_s);
-disp("For body theta( 1 2 3 4 5 6 )=>( 0 0 0 0 pi/2 0 )");
-disp("T_final in body twist");
-disp(T_final_b);
+[IKthetas, success_s] = IKinSpace(SList, M, Tdesired, thetaini, 0.00001, 0.00001);
+[IKthetab, success_b] = IKinBody(BList, M, Tdesired, thetaini, 0.00001, 0.00001);
 
-% checking purpose
-AdjM = Adjoint(M);
-disp("screw_s");
-disp(screw_s);
-disp("screw_b");
-disp(screw_b);
-disp("AdjM(screw_b)");
-disp(AdjM * screw_b);
+Tchecks = FKinSpace(M, SList, IKthetas);
+Tcheckb = FKinBody(M, BList, IKthetab);
+
+thetalist, IKthetas, IKthetab, success_s, success_b, Tdesired, Tchecks, Tcheckb 
+
